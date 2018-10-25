@@ -23,7 +23,6 @@ def filter_image(filename, filter):
             im = im.convert("L")
         # Uses make_linear_ramp to create sepia tone palette
         im.putpalette(ImagePalette.sepia("#e5d8ac"))
-        im.save(UPLOAD_FOLDER + "\\a.png")
         out = im
     outfile = filename.split('.')[0] + "_transform"
     out.save(UPLOAD_FOLDER + "\\" + outfile + ".png")
