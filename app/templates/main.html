@@ -5,19 +5,74 @@
 		<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed|Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 		<script src="/static/math.js?r={{reload}}"></script>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var httpRequest;
+			document.getElementById("filter-submit").addEventListener('submit', makeRequest);
+			document.getElementById("fileSelect").addEventListener('change', upload);
+			
+			function upload(input) {
+				if(input.target.files && input.target.files[0]) {
+					var file = input.target.files[0]
+					reader = new FileReader();
+					reader.onload = function() {
+						console.log("Originl image.");
+						console.log(reader.result);
+						document.getElementById('displayImage').setAttribute('src', reader.result);
+					}
+					reader.readAsDataURL(file);
+				}
+			}
+			
+			function makeRequest() {
+				event.preventDefault();
+			
+				httpRequest = new XMLHttpRequest();
+				httpRequest.responseType = 'json';
+				const url = "{{ url_for('upload_file') }}";
+				
+				data = JSON.stringify({
+					image: document.getElementById("displayImage").getAttribute("src") || "fnord",
+					filter: "g"
+				});
+
+				if (!httpRequest) {
+					alert('Giving up :( Cannot create an XMLHTTP instance');
+					return false;
+				}
+				httpRequest.onreadystatechange = responseHandler;
+				httpRequest.open('POST', url);
+				httpRequest.setRequestHeader('Content-Type', 'application/json');
+				httpRequest.send(data);
+			}
+
+			function responseHandler() {
+				if (httpRequest.readyState === XMLHttpRequest.DONE) {
+					if (httpRequest.status === 200) {
+						var image = httpRequest.response.image;
+						document.getElementById('displayImage').setAttribute('src', image);
+					} 
+					else {
+						alert('There was a problem with the request.');
+					}
+				}
+			}
+		});
+		</script>
 	</head>
 	<body>
 		<div class="main">
 			<h1>Filter Star</h1><br/>
 			<hr>
-		<form action="/upload" method="post" enctype="multipart/form-data">
+		<!-- <input id="fileSelect" type="file" required /> -->
+		<form action="/upload" id="filter-submit" method="post" enctype="multipart/form-data">
 			<div id="image_preview">
 				<img id="displayImage" src="{{ filename }}">
 			</div>
 			<hr id="line">
 				<div id="selectImage">
 					<label>Select Your Image</label><br/>
-					<input id="fileSelect" type="file" name="image" required onchange="upload(this)" />
+					<input id="fileSelect" type="file" required />
 					<select id="pet-select" name="filter">
 						<option value="">--Please choose an option--</option>
 						<option value="g">Grayscale</option>
