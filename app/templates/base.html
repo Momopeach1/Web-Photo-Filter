@@ -2,6 +2,7 @@
 <html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='basestyle.css') }}">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -9,6 +10,20 @@
     body,h1 {font-family: "Montserrat", sans-serif}
     img {margin-bottom: -7px}
     .w3-row-padding img {margin-bottom: 12px}
+
+html {
+    color: white;
+    text-shadow:
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    1px 1px 0 #000;  
+  background-image: url('https://htmlcolorcodes.com/assets/images/html-color-codes-color-tutorials-903ea3cb.jpg');
+  
+  text-align: center;
+
+}
+
     </style>
         <head>
             {% if title %}
@@ -28,9 +43,9 @@
                 <a href="/" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Home</a>
                 {% if current_user.is_anonymous %}
                     <a href="{{ url_for('login') }}" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Login</a>
-                    <a href="/filter" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Filter</a>
                 {% else %}
                     <a href="/filter" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Filter</a>
+                    <a href="#" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Profile</a>
                     <a href="{{ url_for('logout') }}" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Logout</a>
                 {% endif %}
                 <a href="#" class="w3-bar-item w3-button w3-text-grey w3-hover-black">Photos</a>
