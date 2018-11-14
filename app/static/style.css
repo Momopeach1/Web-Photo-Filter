@@ -40,7 +40,8 @@ h1{
 	color: #C0C0C0;
 	background-color: #4e4d4b;
 	overflow: auto;
-}
+	opacity: 1
+	}
 
 #selectImage{
 	padding: 19px 21px 14px 15px;
