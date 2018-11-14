@@ -1,4 +1,8 @@
-*__pycache__
+*.pc
+*.pyc
+*.pyo
+__pycache__
+
 uploads
 venv*
 .DS_Store
