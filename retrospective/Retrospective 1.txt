@@ -6,4 +6,4 @@ We’re creating a group chat to make sure we have another way to reach group me
 
 We’re going set deadlines on Trello to make sure we hold each other accountable.
 
-We’re established a single person, to manage out boards on Trello so that we can break up roles better.
+We’re established a single person, to manage our boards on Trello so that we can break up roles better.
