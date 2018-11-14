@@ -8,7 +8,8 @@
 		<script>
 		document.addEventListener('DOMContentLoaded', function() {
 			var httpRequest;
-			document.getElementById("filter-submit").addEventListener('submit', makeRequest);
+			document.getElementById("filter-submit").addEventListener('submit', sendImageToFilter);
+			document.getElementById("profile-submit").addEventListener('click', sendImageToProfile);
 			document.getElementById("fileSelect").addEventListener('change', upload);
 			
 			function upload(input) {
@@ -19,21 +20,22 @@
 						console.log("Originl image.");
 						console.log(reader.result);
 						document.getElementById('displayImage').setAttribute('src', reader.result);
+						document.getElementById('urlhidden').setAttribute('value', reader.result);
 					}
 					reader.readAsDataURL(file);
 				}
 			}
 			
-			function makeRequest() {
+			function sendImageToFilter() {
 				event.preventDefault();
 			
 				httpRequest = new XMLHttpRequest();
 				httpRequest.responseType = 'json';
-				const url = "{{ url_for('upload_file') }}";
+				const url = "{{ url_for('upload_filter') }}";
 				
 				data = JSON.stringify({
-					image: document.getElementById("displayImage").getAttribute("src") || "fnord",
-					filter: "g"
+					image: document.getElementById("urlhidden").getAttribute("value") || "fnord",
+					filter: document.getElementById("filter-select").selectedOptions[0].getAttribute("value") || "g"
 				});
 
 				if (!httpRequest) {
@@ -41,6 +43,25 @@
 					return false;
 				}
 				httpRequest.onreadystatechange = responseHandler;
+				httpRequest.open('POST', url);
+				httpRequest.setRequestHeader('Content-Type', 'application/json');
+				httpRequest.send(data);
+			}
+			
+			function sendImageToProfile() {
+				event.preventDefault();
+			
+				httpRequest = new XMLHttpRequest();
+				const url = "{{ url_for('upload_profile') }}";
+				
+				data = JSON.stringify({
+					image: document.getElementById("displayImage").getAttribute("src") || "fnord"
+				});
+
+				if (!httpRequest) {
+					alert('Giving up :( Cannot create an XMLHTTP instance');
+					return false;
+				}
 				httpRequest.open('POST', url);
 				httpRequest.setRequestHeader('Content-Type', 'application/json');
 				httpRequest.send(data);
@@ -57,6 +78,7 @@
 					}
 				}
 			}
+		
 		});
 		</script>
 	</head>
@@ -73,13 +95,17 @@
 				<div id="selectImage">
 					<label>Select Your Image</label><br/>
 					<input id="fileSelect" type="file" required />
-					<select id="pet-select" name="filter">
+					<input id="urlhidden" type="hidden" value="">
+					<select id="filter-select" name="filter" required>
 						<option value="">--Please choose an option--</option>
 						<option value="g">Grayscale</option>
 						<option value="s">Sepia</option>
 						<option value="b">Blur</option>
 					</select>
 					<input type="submit" value="Upload your image" class="btn btn-primary" />
+					{% if current_user.is_authenticated %}
+					<input id="profile-submit" type="submit" value="Post image to profile" class="btn btn-primary" />
+					{% endif %}
 				</div>
 		</form>
 			</div>

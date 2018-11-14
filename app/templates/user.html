@@ -3,9 +3,19 @@
 {% block content %}
     <h1>User: {{ user.username }}</h1>
     <hr>
-    {% for post in posts %}
-    <p>
-    {{ post.author.username }} says: <b>{{ post.body }}</b>
-    </p>
-    {% endfor %}
+	{% if images %}
+		{% for image in images %}
+		<p>
+			<img src="{{ image.thumbnail }}"</b>
+		</p>
+		{% endfor %}
+	{% else %}
+		<p>This user hasn't filtered any images with us.</p>
+	{% endif %}
+    {% if prev_url %}
+		<a href="{{ prev_url }}">Newer posts</a>
+    {% endif %}
+    {% if next_url %}
+		<a href="{{ next_url }}">Older posts</a>
+	{% endif %}
 {% endblock %}

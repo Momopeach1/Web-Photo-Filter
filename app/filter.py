@@ -3,6 +3,7 @@ import os
 import re
 from io import BytesIO
 from PIL import Image, ImageFilter, ImagePalette
+from app import app
 
 UPLOAD_FOLDER = os.path.basename('uploads')
 
@@ -32,3 +33,31 @@ def filter_image(filename, filter):
     out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
     reg = re.sub("^b(?P<quote>['\"])(.*?)(?P=quote)", r'\2', out_str)
     return reg
+    
+
+# add image filters
+def filter_and_thumbnail(filename):
+    # strip off prefix from JavaScript File Reader
+    image_str = re.sub('^data:image/.+;base64,', '', filename)
+    # save decoded Base64 string to bytes object, to simulate file I/O
+    in_buffer = BytesIO(base64.b64decode(image_str))
+    # Use bytes object to create PIL Image object
+    im = Image.open(in_buffer).convert('RGB')
+    
+    # out.save(UPLOAD_FOLDER + "\\" + outfile + ".png")
+    out = im.copy()
+    out_thumbnail = im.copy()
+    out_thumbnail.thumbnail(app.config['THUMBNAIL_SIZE'])
+    
+    out_buffer = BytesIO()
+    out.save(out_buffer, format="PNG")
+    image_str = out_buffer.getvalue()                     
+    out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
+    reg1 = re.sub("^b(?P<quote>['\"])(.*?)(?P=quote)", r'\2', out_str)
+    
+    th_buffer = BytesIO()
+    out_thumbnail.save(th_buffer, format="JPEG")
+    image_str = th_buffer.getvalue()                     
+    out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
+    reg2 = re.sub("^b(?P<quote>['\"])(.*?)(?P=quote)", r'\2', out_str)
+    return (reg1, reg2)

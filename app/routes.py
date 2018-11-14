@@ -1,16 +1,14 @@
 import os
-import re
 from flask import render_template, flash, request, send_from_directory, redirect, url_for, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
-from app.models import User, Post
-from app.filter import filter_image
+from app.models import User, Image
+from app.filter import filter_image, filter_and_thumbnail
 
 UPLOAD_FOLDER = os.path.basename('uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 
 @app.route("/")
 def main():
@@ -57,30 +55,42 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/upload', methods=['POST'])
-def upload_file():
+@app.route('/filter', methods=['POST'])
+def upload_filter():
     # file = request.files['image']
     # choice = request.form['filter']
     # f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     # file.save(f)
     # new_file = filter.filter_image(file.filename, choice)
     # return render_template('main.html', filename = "/uploads/" + new_file)
-	content = request.get_json()
-	img = filter_image(content['image'], content['filter'])
-	return jsonify(image=img)
+    
+    content = request.get_json()
+    img = filter_image(content['image'], content['filter'])
+    return jsonify(image=img)
+
+@app.route('/upload', methods=['POST'])
+def upload_profile():
+    # file = request.files['image']
+    # choice = request.form['filter']
+    # f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    # file.save(f)
+    # new_file = filter.filter_image(file.filename, choice)
+    # return render_template('main.html', filename = "/uploads/" + new_file)
+    
+    content = request.get_json()
+    result = filter_and_thumbnail(content['image'])
+    post = Image(image=result[0], thumbnail=result[1], author=current_user)
+    db.session.add(post)
+    db.session.commit()
+    flash("Image uploaded successfully.")
+    return render_template('main.html')
 
 @app.route('/user/<username>', methods=['GET'])
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
-    return render_template('user.html', user=user, posts=posts)
-
-@app.after_request
-def add_header(response):
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
-    print(response.headers.get('Cache-Control'))
-    return response
+    page = request.args.get('page', 1, type=int)
+    images = user.images.order_by(Image.timestamp.desc()).paginate(page, error_out=False)
+    next_url = url_for('user', username=user.username, page=images.next_num) if images.has_next else None
+    prev_url = url_for('user', username=user.username, page=images.prev_num) if images.has_prev else None
+    return render_template('user.html', user=user, images=images.items, next_url = next_url, prev_url = prev_url)
