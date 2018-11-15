@@ -83,9 +83,13 @@ def upload_profile():
     db.session.add(post)
     db.session.commit()
     flash("Image uploaded successfully.")
-    return render_template('main.html')
+    return redirect(url_for('user', username=current_user.username))
 
-@app.route('/user/<username>', methods=['GET'])
+@app.route('/upload', methods=['GET'])
+def upload():
+	return redirect(url_for('filter'))
+
+@app.route('/profile/<username>', methods=['GET'])
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
