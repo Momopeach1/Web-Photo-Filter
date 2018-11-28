@@ -27,35 +27,47 @@ def filter_image(filename, filter):
         out = im
     
     # out.save(UPLOAD_FOLDER + "\\" + outfile + ".png")
+    # Use Python Bytes object to simulate file I/O
     out_buffer = BytesIO()
+    # Save image into object as a PNG file
     out.save(out_buffer, format="PNG")
-    image_str = out_buffer.getvalue()                     
+    # Read object into string
+    image_str = out_buffer.getvalue()
+    # Encode bytes object as base64
     out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
+    # strip off Python syntax using regex
     reg = re.sub("^b(?P<quote>['\"])(.*?)(?P=quote)", r'\2', out_str)
     return reg
     
 
-# add image filters
+# take Base64 image as input
+# return tuple of image and its thumbnail and 
 def filter_and_thumbnail(filename):
     # strip off prefix from JavaScript File Reader
     image_str = re.sub('^data:image/.+;base64,', '', filename)
-    # save decoded Base64 string to bytes object, to simulate file I/O
+    # save decoded Base64 string to bytes object
     in_buffer = BytesIO(base64.b64decode(image_str))
     # Use bytes object to create PIL Image object
     im = Image.open(in_buffer).convert('RGB')
-    
-    # out.save(UPLOAD_FOLDER + "\\" + outfile + ".png")
+
+    # Copy original image and create thumbbnail
     out = im.copy()
     out_thumbnail = im.copy()
     out_thumbnail.thumbnail(app.config['THUMBNAIL_SIZE'])
     
+    # Open new bytes object
     out_buffer = BytesIO()
+    # Save image into object as a PNG file
     out.save(out_buffer, format="PNG")
-    image_str = out_buffer.getvalue()                     
+    # Read object into string variable
+    image_str = out_buffer.getvalue()
+    # Encode as Base64 string
     out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
     reg1 = re.sub("^b(?P<quote>['\"])(.*?)(?P=quote)", r'\2', out_str)
     
+    # Open second bytes object
     th_buffer = BytesIO()
+    # Save thumbnail image as JPEG
     out_thumbnail.save(th_buffer, format="JPEG")
     image_str = th_buffer.getvalue()                     
     out_str = str(b"data:image/png;base64," + base64.b64encode(image_str))
