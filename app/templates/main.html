@@ -20,8 +20,6 @@
 					var file = input.target.files[0]
 					reader = new FileReader();
 					reader.onload = function() {
-						console.log("Originl image.");
-						console.log(reader.result);
 						document.getElementById('displayImage').setAttribute('src', reader.result);
 						document.getElementById('urlhidden').setAttribute('value', reader.result);
 					}

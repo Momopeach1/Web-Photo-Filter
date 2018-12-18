@@ -1,10 +1,11 @@
 import os
+from datetime import timedelta
 from flask import render_template, flash, request, send_from_directory, redirect, url_for, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from werkzeug.urls import url_parse
 from app import app, db
 from app.forms import LoginForm, RegistrationForm
-from app.models import User, Image
+from app.models import *
 from app.filter import filter_image, filter_and_thumbnail
 
 UPLOAD_FOLDER = os.path.basename('uploads')
@@ -87,7 +88,7 @@ def upload_profile():
 
 @app.route('/upload', methods=['GET'])
 def upload():
-	return redirect(url_for('filter'))
+    return redirect(url_for('filter'))
 
 @app.route('/profile/<username>', methods=['GET'])
 @login_required
@@ -98,3 +99,38 @@ def user(username):
     next_url = url_for('user', username=user.username, page=images.next_num) if images.has_next else None
     prev_url = url_for('user', username=user.username, page=images.prev_num) if images.has_prev else None
     return render_template('user.html', user=user, images=images.items, next_url = next_url, prev_url = prev_url)
+    
+@app.route('/profile/<username>/albums', methods=['GET'])
+@login_required
+def user_albums(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    albums = user.albums.order_by(Album.timestamp.desc()).paginate(page, error_out=False)
+    next_url = url_for('user', username=user.username, page=albums.next_num) if albums.has_next else None
+    prev_url = url_for('user', username=user.username, page=albums.prev_num) if albums.has_prev else None
+    return render_template('user.html', user=user, albums=albums.items, next_url = next_url, prev_url = prev_url)
+
+@app.route('/album/<id>', methods=['GET'])
+def album_view(id):
+    album = Album.query.get(id)
+    print(album)
+    return render_template('album_view.html', album=album)
+
+@app.route('/album', methods=['GET'])
+def album_create():
+    current_time = datetime.utcnow()
+    delta = current_time - timedelta(weeks=1)
+    items = Image.query.filter(Image.timestamp > delta).all()
+    return render_template('album_create.html', title='Albums', images=items)    
+
+@app.route('/album', methods=['POST'])
+def album_create_():
+    images = request.form.get('images')
+    title = request.form.get('title')
+    print(title)
+    print(type(title))
+    new_album = Album(name=title, creator=current_user.id)
+    db.session.add(new_album)
+    db.session.commit()
+    flash("Album created successfully.")
+    return redirect(url_for('main'))

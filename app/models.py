@@ -11,6 +11,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     images = db.relationship('Image', backref='author', lazy='dynamic')
+    albums = db.relationship('Album', backref='creator_id', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -23,14 +24,38 @@ class User(UserMixin, db.Model):
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.String(size))
-    thumbnail = db.Column(db.String(size))
+    image = db.Column(db.Text(size))
+    thumbnail = db.Column(db.Text(size))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __repr__(self):
         return '<Post {}>'.format(self.image)
+
+album_list = db.Table('album_list', 
+    db.Column('album_id', db.Integer, db.ForeignKey('album.id'), primary_key=True),
+    db.Column('image_id', db.Integer, db.ForeignKey('image.id'), primary_key=True)
+)
         
+class Album(db.Model):	
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    creator = db.Column(db.Integer, db.ForeignKey('user.id'))
+    images = db.relationship('Image', 
+							  secondary=album_list, 
+							  lazy='dynamic', 
+							  backref=db.backref('albums', lazy='dynamic') 
+							 )
+    timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    
+    def add_image(self, image):
+        # if not self.in_album(image):
+        self.images.append(image)
+
+    def remove_image(self, image):
+        # if self.in_album(image):
+        self.images.remove(image)
+
 @login_manager.user_loader
 def get_user(user_id):
     return User.query.get(int(user_id))

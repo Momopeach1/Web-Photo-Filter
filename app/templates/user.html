@@ -4,11 +4,13 @@
     <h1>User: {{ user.username }}</h1>
     <hr>
 	{% if images %}
+		<div class="image-container">
 		{% for image in images %}
-		<p>
-			<img src="{{ image.thumbnail }}"</b>
-		</p>
+		<div>
+			<img src="{{ image.thumbnail }}">
+		</div>
 		{% endfor %}
+		</div>
 	{% else %}
 		<p>This user hasn't filtered any images with us.</p>
 	{% endif %}
@@ -18,4 +20,24 @@
     {% if next_url %}
 		<a href="{{ next_url }}">Older posts</a>
 	{% endif %}
+    <hr>
+	<div class="image-container">
+		{% if albums %}
+		{% for album in albums %}
+		<div>
+			<a href="{{ url_for('album_view', id=album.id) }}">
+				<img src="{{ url_for('static', filename='album.png') }}">
+			</a>
+		</div>
+		{% endfor %}
+		{% endif %}
+		<div>
+			<a href="{{ url_for('album_create') }}">
+				<label> 
+					<img src="{{ url_for('static', filename='plus_sign.jpg') }}"><br>
+					Create New Album
+				</label>
+			</a>
+		</div>
+	</div>
 {% endblock %}
