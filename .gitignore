@@ -7,4 +7,4 @@ uploads
 venv*
 **/.DS_Store
 app/*.db
-migrations
+migrations/
