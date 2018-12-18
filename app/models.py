@@ -24,8 +24,8 @@ class User(UserMixin, db.Model):
 
 class Image(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    image = db.Column(db.Text(size))
-    thumbnail = db.Column(db.Text(size))
+    image = db.Column(db.Text())
+    thumbnail = db.Column(db.Text())
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
