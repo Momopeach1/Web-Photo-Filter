@@ -7,7 +7,9 @@ Web Photo filter is an app that allows you to upload a photo, select a filter an
 Web Photo filter is created using the Flask framework. Dependencies are listed in the file "requirements.txt".
 
 ## Run Locally
-After downloading the repository enter the following command while in the main directory:
+After downloading the repository enter the following command from the main directory:
 ```
 flask run
-'''
+```
+
+
