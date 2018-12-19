@@ -12,4 +12,6 @@ After downloading the repository enter the following command from the main direc
 flask run
 ```
 
+## Creators
+_Kristoff, Mo, Ray, Pian_
 
