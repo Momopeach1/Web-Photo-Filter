@@ -85,6 +85,26 @@ def upload_profile():
     db.session.commit()
     flash("Image uploaded successfully.")
     return redirect(url_for('user', username=current_user.username))
+    
+
+@app.route('/uploadalbum', methods=['POST'])
+def upload_album():
+    # file = request.files['image']
+    # choice = request.form['filter']
+    # f = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
+    # file.save(f)
+    # new_file = filter.filter_image(file.filename, choice)
+    # return render_template('main.html', filename = "/uploads/" + new_file)
+    
+    content = request.get_json()
+    result = filter_and_thumbnail(content['image'])
+    album = Album.query.get(content['album'])
+    post = Image(image=result[0], thumbnail=result[1], author=current_user)
+    db.session.add(post)
+    album.add_image(post)
+    db.session.commit()
+    flash("Image uploaded successfully.")
+    return redirect(url_for('user', username=current_user.username))
 
 @app.route('/upload', methods=['GET'])
 def upload():
@@ -132,5 +152,7 @@ def album_create_():
     new_album = Album(name=title, creator=current_user.id)
     db.session.add(new_album)
     db.session.commit()
+    for id in images:
+        album.add_images(Image.query.get(int(id)))
     flash("Album created successfully.")
     return redirect(url_for('main'))

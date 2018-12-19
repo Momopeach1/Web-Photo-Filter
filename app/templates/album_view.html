@@ -9,6 +9,11 @@
 					<img src="{{ image.thumbnail }}"</b>
 				</div>
 			{% endfor %}
+				<div>
+					<a href="">
+					<img src="{{ url_for('static', filename='plus_sign.jpg' }}">
+					</a>
+				</div>
 		</div>
 	{% else %}
 		<p>No images in album.</p>

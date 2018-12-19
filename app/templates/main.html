@@ -13,6 +13,7 @@
 			var httpRequest;
 			document.getElementById("filter-submit").addEventListener('submit', sendImageToFilter);
 			document.getElementById("profile-submit").addEventListener('click', sendImageToProfile);
+			document.getElementById("album-submit").addEventListener('click', sendImageToAlbum);
 			document.getElementById("fileSelect").addEventListener('change', upload);
 			
 			function upload(input) {
@@ -67,12 +68,36 @@
 				httpRequest.setRequestHeader('Content-Type', 'application/json');
 				httpRequest.send(data);
 			}
+			
+			
+			function sendImageToAlbum() {
+				event.preventDefault();
+			
+				httpRequest = new XMLHttpRequest();
+				httpRequest.responseType = 'json';
+				const url = "{{ url_for('upload_album') }}";
+				
+				data = JSON.stringify({
+					image: document.getElementById("urlhidden").getAttribute("value") || "fnord",
+					album: document.getElementById("album-select").selectedOptions[0].getAttribute("value") || "g"
+				});
+
+				if (!httpRequest) {
+					alert('Giving up :( Cannot create an XMLHTTP instance');
+					return false;
+				}
+				httpRequest.onreadystatechange = responseHandler;
+				httpRequest.open('POST', url);
+				httpRequest.setRequestHeader('Content-Type', 'application/json');
+				httpRequest.send(data);
+			}
 
 			function responseHandler() {
 				if (httpRequest.readyState === XMLHttpRequest.DONE) {
 					if (httpRequest.status === 200) {
 						var image = httpRequest.response.image;
 						document.getElementById('displayImage').setAttribute('src', image);
+						alert('Request successful');
 					} 
 					else {
 						alert('There was a problem with the request.');
@@ -107,6 +132,17 @@
 					{% if current_user.is_authenticated %}
 					<input id="profile-submit" type="submit" value="Post image to profile" class="btn btn-primary" />
 					{% endif %}
+					{% if current_user.is_authenticated %}
+					<hr>
+					<select id="album-select" name="album">
+						<option value="">--Please choose an option--</option>
+						{% for album in current_user.albums.all()%}
+							<option value="{{ album.id }}">{{album.name}}</option>
+						{% endfor %}
+					<input id="album-submit" type="submit" value="Post image to album" class="btn btn-primary" />
+					</select>
+					{% endif %}
+				</div>
 				</div>
 		</form>
 			</div>
