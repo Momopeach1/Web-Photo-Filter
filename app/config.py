@@ -7,5 +7,5 @@ class Config(object):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
     'sqlite:///' + os.path.join(basedir, 'app.db')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    THUMBNAIL_SIZE = (128, 128)
+    THUMBNAIL_SIZE = (200, 200)
     BASE64_URL_SIZE = 2.667e8
