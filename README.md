@@ -1,4 +1,4 @@
-# Web Photo Filter 📸
+# Web Photo Filter  📸
 
 Web Photo filter is an app that allows you to upload a photo, select a filter and download the edited photo. Additionally, you can create an account and store your photos in our database.
 
