@@ -10,9 +10,13 @@
 				</div>
 			{% endfor %}
 				<div>
-					<a href="">
-					<img src="{{ url_for('static', filename='plus_sign.jpg') }}">
+					<a href="{{ url_for('filter') }}">
+						<label> 
+							<img src="{{ url_for('static', filename='plus_sign.jpg') }}"><br>
+							Add New Image
+						</label>
 					</a>
+				</div>
 				</div>
 		</div>
 	{% else %}

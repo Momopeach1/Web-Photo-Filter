@@ -118,7 +118,7 @@ def user(username):
     images = user.images.order_by(Image.timestamp.desc()).paginate(page, error_out=False)
     next_url = url_for('user', username=user.username, page=images.next_num) if images.has_next else None
     prev_url = url_for('user', username=user.username, page=images.prev_num) if images.has_prev else None
-    return render_template('user.html', user=user, images=images.items, next_url = next_url, prev_url = prev_url)
+    return render_template('user.html', user=user, images=images.items, next_url = next_url, prev_url = prev_url, switch=True)
     
 @app.route('/profile/<username>/albums', methods=['GET'])
 @login_required
@@ -128,7 +128,7 @@ def user_albums(username):
     albums = user.albums.order_by(Album.timestamp.desc()).paginate(page, error_out=False)
     next_url = url_for('user', username=user.username, page=albums.next_num) if albums.has_next else None
     prev_url = url_for('user', username=user.username, page=albums.prev_num) if albums.has_prev else None
-    return render_template('user.html', user=user, albums=albums.items, next_url = next_url, prev_url = prev_url)
+    return render_template('user.html', user=user, albums=albums.items, next_url = next_url, prev_url = prev_url, switch=False)
 
 @app.route('/album/<id>', methods=['GET'])
 def album_view(id):
@@ -153,6 +153,6 @@ def album_create_():
     db.session.add(new_album)
     db.session.commit()
     for id in images:
-        album.add_images(Image.query.get(int(id)))
+        new_album.add_images(Image.query.get(int(id)))
     flash("Album created successfully.")
     return redirect(url_for('main'))
